@@ -31,7 +31,7 @@
 # DEBUG=0 for no output
 # DEBUG=1 for sleep prints
 # DEBUG=2 for everything
-DEBUG=2
+DEBUG=0
 
 # this is actually the minimum allowed dynamic delay; also the default (if something fails)
 default_sleep_delay=50
@@ -47,6 +47,7 @@ firefox_html5_detection=1
 chromium_flash_detection=1
 chromium_html5_detection=1
 chrome_pepper_flash_detection=1
+chromium_pepper_flash_detection=1
 chrome_html5_detection=1
 opera_flash_detection=1
 opera_html5_detection=1
@@ -224,6 +225,18 @@ isAppRunning()
         fi
     fi
 
+    # Check if user want to detect flash fullscreen on Chromium, modify variable chromium_pepper_flash_detection if you dont want Chromium pepper flash detection.
+    if [ $chromium_pepper_flash_detection == 1 ];then
+        if [[ "$activ_win_title" = *chromium* ]];then
+        # Check if Chromium Flash process is running
+            chrome_process=`pgrep -lfc "chromium-browser --type=ppapi "`
+            if [[ $chrome_process -ge 1 ]];then
+                log "isAppRunning(): chromium flash fullscreen detected"
+                return 1
+            fi
+        fi
+    fi
+
     # Check if user want to detect html5 fullscreen on Chrome, modify variable chrome_html5_detection if you dont want Chrome html5 detection.
     if [ $chrome_html5_detection == 1 ];then
         if [[ "$activ_win_title" = *google-chrome* ]];then
@@ -352,10 +365,12 @@ _sleep()
         log "sleeping for $delay"
         sleep $delay
     else
-        if [ "$(cat /sys/class/power_supply/AC/online)" == "1" ]; then
-            system_sleep_delay=$(gsettings get org.gnome.settings-daemon.plugins.power sleep-display-ac 2>/dev/null)
-        else
-            system_sleep_delay=$(gsettings get org.gnome.settings-daemon.plugins.power sleep-display-battery 2>/dev/null)
+        if [ -f /sys/class/power_supply/AC/online ]; then
+            if [ "$(cat /sys/class/power_supply/AC/online)" == "1" ]; then
+                system_sleep_delay=$(gsettings get org.gnome.settings-daemon.plugins.power sleep-display-ac 2>/dev/null)
+            else
+                system_sleep_delay=$(gsettings get org.gnome.settings-daemon.plugins.power sleep-display-battery 2>/dev/null)
+            fi
         fi
         if [ "$(echo $system_sleep_delay | egrep -c "^[0-9]+$")" == "1" ]; then
             if [ $system_sleep_delay -le $(($default_sleep_delay+5)) ]; then
