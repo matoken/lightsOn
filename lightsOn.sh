@@ -46,8 +46,8 @@ firefox_flash_detection=1
 firefox_html5_detection=1
 chromium_flash_detection=1
 chromium_html5_detection=1
-chrome_pepper_flash_detection=1
 chromium_pepper_flash_detection=1
+chrome_pepper_flash_detection=1
 chrome_html5_detection=1
 opera_flash_detection=1
 opera_html5_detection=1
@@ -75,29 +75,20 @@ do
     displays="$displays $id"
 done < <(xvinfo | sed -n 's/^screen #\([0-9]\+\)$/\1/p')
 
-
 # Detect screensaver been used (xscreensaver, kscreensaver or none)
-screensaver=`pgrep -l xscreensaver | grep -wc xscreensaver`
-if [ $screensaver -ge 1 ]; then
+if [ `pgrep -l xscreensaver | grep -wc xscreensaver` -ge 1 ]; then
     screensaver=xscreensaver
     log "xscreensaver detected"
+elif [ `pgrep -l kscreensaver | grep -wc kscreensaver` -ge 1 ]; then
+    screensaver=kscreensaver
+    log "kscreensaver detected"
+elif [ `pgrep -l xautolock | grep -wc xautolock` -ge 1 ]; then
+    screensaver=xautolock
+    log "xautolock detected"
 else
-    screensaver=`pgrep -l kscreensaver | grep -wc kscreensaver`
-    if [ $screensaver -ge 1 ]; then
-        screensaver=kscreensaver
-        log "kscreensaver detected"
-    else
-        screensaver=`pgrep -l xautolock | grep -wc xautolock`
-        if [ $screensaver -ge 1 ]; then
-            screensaver=xautolock
-            log "xautolock detected"
-        else
-            screensaver=None
-            log "No screensaver detected"
-        fi
-    fi
+    screensaver=None
+    log "No screensaver detected, but it could be gnome"
 fi
-
 
 checkDelayProgs()
 {
@@ -110,7 +101,6 @@ checkDelayProgs()
         fi
     done
 }
-
 
 checkFullscreen()
 {
@@ -213,18 +203,6 @@ isAppRunning()
         fi
     fi
 
-    # Check if user want to detect flash fullscreen on Chrome, modify variable chrome_pepper_flash_detection if you dont want Chrome pepper flash detection.
-    if [ $chrome_pepper_flash_detection == 1 ];then
-        if [[ "$activ_win_title" = *google-chrome* ]];then
-        # Check if Chrome Flash process is running
-            chrome_process=`pgrep -lfc "(c|C)hrome --type=ppapi "`
-            if [[ $chrome_process -ge 1 ]];then
-                log "isAppRunning(): chrome flash fullscreen detected"
-                return 1
-            fi
-        fi
-    fi
-
     # Check if user want to detect flash fullscreen on Chromium, modify variable chromium_pepper_flash_detection if you dont want Chromium pepper flash detection.
     if [ $chromium_pepper_flash_detection == 1 ];then
         if [[ "$activ_win_title" = *chromium* ]];then
@@ -232,6 +210,18 @@ isAppRunning()
             chrome_process=`pgrep -lfc "chromium-browser --type=ppapi "`
             if [[ $chrome_process -ge 1 ]];then
                 log "isAppRunning(): chromium flash fullscreen detected"
+                return 1
+            fi
+        fi
+    fi
+
+    # Check if user want to detect flash fullscreen on Chrome, modify variable chrome_pepper_flash_detection if you dont want Chrome pepper flash detection.
+    if [ $chrome_pepper_flash_detection == 1 ];then
+        if [[ "$activ_win_title" = *google-chrome* ]];then
+        # Check if Chrome Flash process is running
+            chrome_process=`pgrep -lfc "(c|C)hrome --type=ppapi "`
+            if [[ $chrome_process -ge 1 ]];then
+                log "isAppRunning(): chrome flash fullscreen detected"
                 return 1
             fi
         fi
@@ -349,7 +339,6 @@ delayScreensaver()
         dbus-send --session --dest=org.gnome.ScreenSaver --type=method_call /org/gnome/ScreenSaver org.gnome.ScreenSaver.SimulateUserActivity
     fi
 
-
     #Check if DPMS is on. If it is, deactivate. If it is not, do nothing.
     dpmsStatus=`xset -q | grep -ce 'DPMS is Enabled'`
     if [ $dpmsStatus == 1 ];then
@@ -386,7 +375,6 @@ _sleep()
     fi
 }
 
-
 delay=$1
 dynamicDelay=0
 
@@ -396,7 +384,6 @@ if [ -z "$1" ];then
     log "no delay specified, dynamicDelay=1"
 fi
 
-
 # If argument is not integer quit.
 if [[ $1 = *[^0-9]* ]]; then
     echo "The Argument \"$1\" is not valid, not an integer"
@@ -405,7 +392,6 @@ if [[ $1 = *[^0-9]* ]]; then
     exit 1
 fi
 
-
 while true
 do
     checkDelayProgs
@@ -413,6 +399,4 @@ do
     _sleep $delay
 done
 
-
 exit 0
-
