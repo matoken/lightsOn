@@ -12,7 +12,6 @@
 # Also, screensaver can be prevented when certain specified programs are running.
 # lightsOn.sh needs xscreensaver or kscreensaver to work.
 
-
 # HOW TO USE: Start the script with the number of seconds you want the checks
 # for fullscreen to be done. Example:
 # "./lightsOn.sh 120 &" will Check every 120 seconds if Mplayer, Minitube
@@ -51,6 +50,8 @@ chrome_pepper_flash_detection=1
 chrome_html5_detection=1
 opera_flash_detection=1
 opera_html5_detection=1
+epiphany_html5_detection=1
+webkit_flash_detection=1
 minitube_detection=0
 
 # Names of programs which, when running, you wish to delay the screensaver.
@@ -151,7 +152,7 @@ isAppRunning()
 {
     log "isAppRunning()"
     #Get title of active window
-    activ_win_title=`xprop -id $activ_win_id | grep "WM_CLASS(STRING)"`   # I used WM_NAME(STRING) before, WM_CLASS more accurate.
+    activ_win_title=`xprop -id $activ_win_id | grep "WM_CLASS(STRING)"`
 
     # Check if user want to detect Video fullscreen on Firefox, modify variable firefox_flash_detection if you dont want Firefox detection
     if [ $firefox_flash_detection == 1 ];then
@@ -265,6 +266,30 @@ isAppRunning()
         fi
     fi
 
+    # Check if user want to detect html5 fullscreen on Epiphany, modify variable epiphany_html5_detection if you dont want Epiphany html5 detection.
+    if [ $epiphany_html5_detection == 1 ];then
+        if [[ "$activ_win_title" = *epiphany* ]];then
+        # Check if Epiphany html5 process is running
+            epiphany_process=`pgrep -lfc "epiphany"`
+            if [[ $epiphany_process -ge 1 ]];then
+                log "isAppRunning(): epiphany html5 fullscreen detected"
+                return 1
+            fi
+        fi
+    fi
+
+    # Check if user want to detect Video fullscreen on Webkit, modify variable webkit_flash_detection if you dont want Webkit detection
+    if [ $webkit_flash_detection == 1 ];then
+        if [[ "$activ_win_title" = *WebkitPluginProcess* ]];then
+        # Check if Webkit Flash process is running
+            flash_process=`pgrep -lfc ".*WebkitPluginProcess.*flashp.*"`
+            if [[ $flash_process -ge 1 ]];then
+                log "isAppRunning(): Webkit flash fullscreen detected"
+                return 1
+            fi
+        fi
+    fi
+
     #check if user want to detect mplayer fullscreen, modify variable mplayer_detection
     if [ $mplayer_detection == 1 ];then
         if [[ "$activ_win_title" = *mplayer* || "$activ_win_title" = *MPlayer* ]];then
@@ -335,8 +360,13 @@ delayScreensaver()
         xautolock -disable
         xautolock -enable
     else
-        log "delayScreensaver(): delaying org.gnome.ScreenSaver..."
+        log "delayScreensaver(): delaying org.gnome.ScreenSaver or anything else..."
         dbus-send --session --dest=org.gnome.ScreenSaver --type=method_call /org/gnome/ScreenSaver org.gnome.ScreenSaver.SimulateUserActivity
+        if [ -f /usr/bin/xdg-screensaver ]; then
+            log "delayScreensaver(): trying to delay with xdg-screensaver..."
+            xdg-screensaver reset
+        fi
+        xdotool key ctrl
     fi
 
     #Check if DPMS is on. If it is, deactivate. If it is not, do nothing.
