@@ -30,7 +30,7 @@
 # DEBUG=0 for no output
 # DEBUG=1 for sleep prints
 # DEBUG=2 for everything
-DEBUG=0
+DEBUG=2
 
 # this is actually the minimum allowed dynamic delay; also the default (if something fails)
 default_sleep_delay=50
@@ -278,13 +278,13 @@ isAppRunning()
         fi
     fi
 
-    # Check if user want to detect Video fullscreen on Webkit, modify variable webkit_flash_detection if you dont want Webkit detection
+    # Check if user want to detect Video fullscreen on WebKit, modify variable webkit_flash_detection if you dont want Webkit detection
     if [ $webkit_flash_detection == 1 ];then
-        if [[ "$activ_win_title" = *WebkitPluginProcess* ]];then
-        # Check if Webkit Flash process is running
-            flash_process=`pgrep -lfc ".*WebkitPluginProcess.*flashp.*"`
+        if [[ "$activ_win_title" = *WebKitPluginProcess* ]];then
+        # Check if WebKit Flash process is running
+            flash_process=`pgrep -lfc ".*WebKitPluginProcess.*flashp.*"`
             if [[ $flash_process -ge 1 ]];then
-                log "isAppRunning(): Webkit flash fullscreen detected"
+                log "isAppRunning(): webkit flash fullscreen detected"
                 return 1
             fi
         fi
