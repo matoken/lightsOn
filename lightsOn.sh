@@ -364,7 +364,10 @@ delayScreensaver()
             log "delayScreensaver(): trying to delay with xdg-screensaver..."
             xdg-screensaver reset
         fi
-        xdotool key ctrl
+        if [ -f /usr/bin/xdotool ]; then
+            log "delayScreensaver(): trying to delay with xdotool..."
+            xdotool key ctrl
+        fi
     fi
 
     #Check if DPMS is on. If it is, deactivate. If it is not, do nothing.
