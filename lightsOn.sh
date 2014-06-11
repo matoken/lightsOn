@@ -110,9 +110,7 @@ checkFullscreen()
     for display in $displays
     do
         #get id of active window and clean output
-        activ_win_id=`DISPLAY=:0.${display} xprop -root _NET_CLIENT_LIST_STACKING` #previously used _NET_ACTIVE_WINDOW, but it didn't work with some flash players (eg. Twitch.tv) in firefox
-        #activ_win_id=${activ_win_id#*# } #gives error if xprop returns extra ", 0x0" (happens on some distros)
-        activ_win_id=${activ_win_id:${#activ_win_id}-10:10}
+        activ_win_id=`DISPLAY=:0.${display} xprop -root _NET_CLIENT_LIST_STACKING | sed 's/.*\, //'` #previously used _NET_ACTIVE_WINDOW, but it didn't work with some flash players (eg. Twitch.tv) in firefox. Using sed because id lengths can vary.
 
         # Skip invalid window ids (commented as I could not reproduce a case
         # where invalid id was returned, plus if id invalid
@@ -366,7 +364,10 @@ delayScreensaver()
             log "delayScreensaver(): trying to delay with xdg-screensaver..."
             xdg-screensaver reset
         fi
-        xdotool key ctrl
+        if [ -f /usr/bin/xdotool ]; then
+            log "delayScreensaver(): trying to delay with xdotool..."
+            xdotool key ctrl
+        fi
     fi
 
     #Check if DPMS is on. If it is, deactivate. If it is not, do nothing.
