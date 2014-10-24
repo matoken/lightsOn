@@ -3,41 +3,46 @@
 
 # Copyright (c) 2013 iye.cba at gmail com
 # url: https://github.com/iye/lightsOn
+# Maintainer: Dylan Smith
+# url: https://github.com/dyskette/lightsOn
 # This script is licensed under GNU GPL version 2.0 or above
 
 # Description: Bash script that prevents the screensaver and display power
-# management (DPMS) to be activated when you are watching Flash Videos
-# fullscreen on Firefox and Chromium.
-# Can detect mplayer, minitube, and VLC when they are fullscreen too.
+# management (DPMS) to be activated when you are watching Flash or HTML5 Videos.
+#
+# It can detect mpv, mplayer, minitube, and VLC when they are fullscreen too.
 # Also, screensaver can be prevented when certain specified programs are running.
-# lightsOn.sh needs xscreensaver or kscreensaver to work.
+# lightsOn.sh can work with any screensaver if xdotool is installed
 
 # HOW TO USE: Start the script with the number of seconds you want the checks
 # for fullscreen to be done. Example:
-# "./lightsOn.sh 120 &" will Check every 120 seconds if Mplayer, Minitube
-# VLC, Firefox, Chrome or Chromium are fullscreen and delay screensaver and Power Management if so.
-# You want the number of seconds to be ~10 seconds less than the time it takes
-# your screensaver or Power Management to activate.
-# If you don't pass an argument, the checks are done every X seconds.
-# Where X is calculated based on your system sleep time, with a minimum of $default_sleep_delay.
 #
-# An optional array variable exists here to add the names of programs that will delay the screensaver if they're running.
-# This can be useful if you want to maintain a view of the program from a distance, like a music playlist for DJing,
-# or if the screensaver eats up CPU that chops into any background processes you have running,
-# such as realtime music programs like Ardour in MIDI keyboard mode.
-# If you use this feature, make sure you use the name of the binary of the program (which may exist, for instance, in /usr/bin).
+# "./lightsOn.sh 120 &" will Check every 120 seconds if any of the supported
+# applications are fullscreen and delay screensaver and Power Management if so.
+#
+# You want the number of seconds to be ~10 seconds less than the time it takes
+# your screensaver or Power Management to activate. If you don't pass an
+# argument, the checks are done every X seconds. Where X is calculated based on
+# your system sleep time, with a minimum of $default_sleep_delay.
+#
+# An optional array variable exists here to add the names of programs that will
+# delay the screensaver if they're running. This can be useful if you want to
+# maintain a view of the program from a distance, like a music playlist.
+#
+# If you use this feature, make sure you use the name of the binary of the
+# program (which may exist, for instance, in /usr/bin).
 
 # DEBUG=0 for no output
 # DEBUG=1 for sleep prints
 # DEBUG=2 for everything
 DEBUG=2
 
-# this is actually the minimum allowed dynamic delay; also the default (if something fails)
+# this is actually the minimum allowed dynamic delay.
+# Also the default (if everything else fails)
 default_sleep_delay=50
 
-# Modify these variables if you want this script to detect if Mplayer,
-# VLC, Minitube, or Firefox or Chromium Flash Video are Fullscreen and disable
-# xscreensaver/kscreensaver and PowerManagement.
+# Modify these variables if you want this script to detect if MPV, Mplayer,
+# VLC, Minitube, or a web browser Flash/HTML5 Video.
 mplayer_detection=1
 mpv_detection=1
 vlc_detection=1
@@ -190,7 +195,7 @@ isAppRunning()
         fi
     fi
 
-    # Check if user want to detect html5 fullscreen on Chromium, modify variable chrome_html5_detection if you dont want Chromium html5 detection.
+    # Check if user want to detect html5 fullscreen on Chromium, modify variable chromium_html5_detection if you dont want Chromium html5 detection.
     if [ $chromium_html5_detection == 1 ];then
         if [[ "$activ_win_title" = *chromium* ]];then
         # Check if Chromium html5 process is running
