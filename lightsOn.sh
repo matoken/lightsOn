@@ -43,7 +43,7 @@
 # DEBUG=0 for no output
 # DEBUG=1 for sleep prints
 # DEBUG=2 for everything
-DEBUG=0
+DEBUG=2
 
 # this is actually the minimum allowed dynamic delay.
 # Also the default (if everything else fails)
@@ -446,9 +446,9 @@ delayScreensaver()
     fi
 
     # Reset gnome session idle timer
-    if [ gsettings_present == 1 ]; then
-        sessionIdleDelay=$(gsettings get org.gnome.desktop.session idle-delay | sed "s/^.* //")
-        if [ $sessionIdleDelay > 0 ];then
+    if [[ $gsettings_present == 1 && $(gsettings get org.gnome.desktop.session idle-delay 2>/dev/null) ]]; then
+        sessionIdleDelay=$(gsettings get org.gnome.desktop.session idle-delay 2>/dev/null | sed "s/^.* //")
+        if [[ $sessionIdleDelay -ge 1 ]];then
             log "delayScreensaver(): resetting gnome session..."
             gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null
             gsettings set org.gnome.desktop.session idle-delay $sessionIdleDelay 2>/dev/null
