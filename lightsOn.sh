@@ -38,12 +38,12 @@
 # If you use this feature, make sure you use the name of the binary of the
 # program (which may exist, for instance, in /usr/bin).
 
-# VERSION=0.0.9
+# VERSION=v0.1
 
 # DEBUG=0 for no output
 # DEBUG=1 for sleep prints
 # DEBUG=2 for everything
-DEBUG=2
+DEBUG=0
 
 # this is actually the minimum allowed dynamic delay.
 # Also the default (if everything else fails)
