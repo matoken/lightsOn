@@ -70,7 +70,7 @@ minitube_detection=0
 gsettings_present=$(if [ -x $(which gsettings) ]; then echo 1; else echo 0; fi)
 xdg_screensaver_present=$(if [ -x $(which xdg-screensaver) ]; then echo 1; else echo 0; fi)
 
-# Names of programs which, when running, you wish to delay the screensaver.
+# Names of the programs of which, when running, you wish to delay the screensaver.
 delay_progs=() # For example ('ardour2' 'gmpc')
 
 # Display outputs to check, display screensaver when they are connected
@@ -86,11 +86,12 @@ DPMS_SuspendTime=600
 DPMS_OffTime=600
 
 # X11 Screen Saver Extension settings in seconds, 600 seconds = 10 minutes.
-# if you don't want to change X11 Scrensaver Extension settings, use X11 Scrensaver Extension_Control=0
+# if you don't want to change X11 Scrensaver Extension settings, use X11ScreenSaver_Control=0
 X11ScreenSaver_Control=1
 X11ScreenSaver_Timeout=600
 
-# YOU SHOULD NOT NEED TO MODIFY ANYTHING BELOW THIS LINE
+# YOU DO NOT NEED TO MODIFY ANYTHING BELOW THIS LINE
+# --------------------------------------------------
 
 log() {
     if [ $DEBUG -eq 2 ]; then
@@ -170,7 +171,7 @@ checkFullscreen()
         #     continue
         #fi
 
-        # Check if Active Window (the foremost window) is in fullscreen state
+        # Check if Active Window (the foremost window) is in a fullscreen state
         if [[ -n $activ_win_id ]]; then
             isActivWinFullscreen=$(DISPLAY=:${display} xprop -id $activ_win_id | grep _NET_WM_STATE_FULLSCREEN)
             isActivWinAbove=$(DISPLAY=:${display} xprop -id $activ_win_id | grep _NET_WM_STATE_ABOVE)
@@ -184,7 +185,7 @@ checkFullscreen()
                     delayScreensaver
                     return
                 fi
-            # If no Fullscreen active => set dpms on
+            # If no Fullscreen is active => set dpms on
             else
                 log "checkFullscreen(): NO fullscreen detected"
                 xset dpms
@@ -201,9 +202,9 @@ checkFullscreen()
     done
 }
 
-# check if active windows is mplayer, vlc or firefox
-#TODO only window name in the variable activ_win_id, not whole line.
-#Then change IFs to detect more specifically the apps "<vlc>" and if process name exist
+# check if an active window is mplayer, vlc or firefox
+#TODO only a window name in the variable activ_win_id, not whole line.
+#Then change IFs to detect more specifically the apps "<vlc>" and if a process name exists
 
 isAppRunning()
 {
@@ -211,7 +212,7 @@ isAppRunning()
     #Get title of active window
     activ_win_title=$(xprop -id $activ_win_id | grep "WM_CLASS(STRING)")
 
-    # Check if user want to detect Video fullscreen on Firefox, modify variable firefox_flash_detection if you dont want Firefox detection
+    # Check if a user wants to detect Video fullscreen on Firefox, modify variable firefox_flash_detection if you dont want Firefox detection
     if [ $firefox_flash_detection == 1 ];then
         if [[ "$activ_win_title" = *unknown* || "$activ_win_title" = *plugin-container* ]];then
             # Check if plugin-container process is running
@@ -222,7 +223,7 @@ isAppRunning()
         fi
     fi
 
-    # Check if user want to detect HTML Video fullscreen on Firefox, modify variable firefox_html5_detection if you dont want Firefox detection
+    # Check if a user wants to detect HTML Video fullscreen on Firefox, modify variable firefox_html5_detection if you dont want Firefox detection
     if [ $firefox_html5_detection == 1 ];then
         if [[ "$activ_win_title" = *Firefox* || "$activ_win_title" = *Iceweasel* ]];then
             # Check if firefox process is actually running
@@ -234,7 +235,7 @@ isAppRunning()
         fi
     fi
 
-    # Check if user want to detect Video fullscreen on Chromium, modify variable chromium_flash_detection if you dont want Chromium detection
+    # Check if a user wants to detect Video fullscreen on Chromium, modify variable chromium_flash_detection if you dont want Chromium detection
     if [ $chromium_flash_detection == 1 ];then
         if [[ "$activ_win_title" = *exe* || "$activ_win_title" = *hromium* ]];then
             # Check if Chromium Flash process is running
@@ -246,7 +247,7 @@ isAppRunning()
         fi
     fi
 
-    # Check if user want to detect html5 fullscreen on Chromium, modify variable chromium_html5_detection if you dont want Chromium html5 detection.
+    # Check if a user wants to detect html5 fullscreen on Chromium, modify variable chromium_html5_detection if you dont want Chromium html5 detection.
     if [ $chromium_html5_detection == 1 ];then
         if [[ "$activ_win_title" == *hromium* ]];then
             # Check if Chromium html5 process is running
@@ -257,7 +258,7 @@ isAppRunning()
         fi
     fi
 
-    # Check if user want to detect flash fullscreen on Chromium, modify variable chromium_pepper_flash_detection if you dont want Chromium pepper flash detection.
+    # Check if a user wants to detect flash fullscreen on Chromium, modify variable chromium_pepper_flash_detection if you dont want Chromium pepper flash detection.
     if [ $chromium_pepper_flash_detection == 1 ];then
         if [[ "$activ_win_title" = *hromium* ]];then
         # Check if Chromium Flash process is running
@@ -269,7 +270,7 @@ isAppRunning()
         fi
     fi
 
-    # Check if user want to detect flash fullscreen on Chrome, modify variable chrome_pepper_flash_detection if you dont want Chrome pepper flash detection.
+    # Check if a user wants to detect flash fullscreen on Chrome, modify variable chrome_pepper_flash_detection if you dont want Chrome pepper flash detection.
     if [ $chrome_pepper_flash_detection == 1 ];then
         if [[ "$activ_win_title" = *oogle-chrome* ]];then
         # Check if Chrome Flash process is running
@@ -281,7 +282,7 @@ isAppRunning()
         fi
     fi
 
-    # Check if user want to detect html5 fullscreen on Chrome, modify variable chrome_html5_detection if you dont want Chrome html5 detection.
+    # Check if a user wants to detect html5 fullscreen on Chrome, modify variable chrome_html5_detection if you dont want Chrome html5 detection.
     if [ $chrome_html5_detection == 1 ];then
         if [[ "$activ_win_title" = *oogle-chrome* ]];then
         # Check if Chrome html5 process is running
@@ -295,7 +296,7 @@ isAppRunning()
         fi
     fi
 
-    # Check if user want to detect Video fullscreen on Opera, modify variable opera_flash_detection
+    # Check if a user wants to detect Video fullscreen on Opera, modify variable opera_flash_detection
     if [ $opera_flash_detection == 1 ];then
         if [[ "$activ_win_title" = *operapluginwrapper* ]];then
         # Check if Opera flash process is running
@@ -307,7 +308,7 @@ isAppRunning()
         fi
     fi
 
-    # Check if user want to detect html5 fullscreen on Opera, modify variable chrome_html5_detection if you dont want Opera html5 detection.
+    # Check if a user wants to detect html5 fullscreen on Opera, modify variable chrome_html5_detection if you dont want Opera html5 detection.
     if [ $opera_html5_detection == 1 ];then
         if [[ "$activ_win_title" = *opera* ]];then
         # Check if Opera html5 process is running
@@ -318,7 +319,7 @@ isAppRunning()
         fi
     fi
 
-    # Check if user want to detect html5 fullscreen on Epiphany, modify variable epiphany_html5_detection if you dont want Epiphany html5 detection.
+    # Check if a user wants to detect html5 fullscreen on Epiphany, modify variable epiphany_html5_detection if you dont want Epiphany html5 detection.
     if [ $epiphany_html5_detection == 1 ];then
         if [[ "$activ_win_title" = *epiphany* ]];then
         # Check if Epiphany html5 process is running
@@ -329,7 +330,7 @@ isAppRunning()
         fi
     fi
 
-    # Check if user want to detect Video fullscreen on WebKit, modify variable webkit_flash_detection if you dont want Webkit detection
+    # Check if a user wants to detect Video fullscreen on WebKit, modify variable webkit_flash_detection if you dont want Webkit detection
     if [ $webkit_flash_detection == 1 ];then
         if [[ "$activ_win_title" = *WebKitPluginProcess* ]];then
         # Check if WebKit Flash process is running
@@ -341,7 +342,7 @@ isAppRunning()
         fi
     fi
 
-    #check if user want to detect mplayer fullscreen, modify variable mplayer_detection
+    #Check if a user wants to detect mplayer fullscreen, modify variable mplayer_detection
     if [ $mplayer_detection == 1 ];then
         if [[ "$activ_win_title" = *mplayer* || "$activ_win_title" = *MPlayer* ]];then
             #check if mplayer is running.
@@ -352,7 +353,7 @@ isAppRunning()
         fi
     fi
 
-    #check if user want to detect totem fullscreen, modify variable totem_detection
+    #Check if a user wants to detect totem fullscreen, modify variable totem_detection
     if [ $totem_detection == 1 ];then
         if [[ "$activ_win_title" = *totem* ]];then
             #check if totem is running.
@@ -363,7 +364,7 @@ isAppRunning()
         fi
     fi
 
-    #check if user want to detect mpv fullscreen, modify variable mpv_detection
+    #Check if a user wants to detect mpv fullscreen, modify variable mpv_detection
     if [ $mpv_detection == 1 ];then
         if [[ "$activ_win_title" = *mpv* ]];then
             #check if mpv is running.
@@ -374,7 +375,7 @@ isAppRunning()
         fi
     fi
 
-    # Check if user want to detect vlc fullscreen, modify variable vlc_detection
+    # Check if a user wants to detect vlc fullscreen, modify variable vlc_detection
     if [ $vlc_detection == 1 ];then
         if [[ "$activ_win_title" = *vlc* ]];then
             #check if vlc is running.
@@ -385,7 +386,7 @@ isAppRunning()
         fi
     fi
 
-    # Check if user want to detect minitube fullscreen, modify variable minitube_detection
+    # Check if a user wants to detect minitube fullscreen, modify variable minitube_detection
     if [ $minitube_detection == 1 ];then
         if [[ "$activ_win_title" = *minitube* ]];then
             #check if minitube is running.
@@ -423,11 +424,6 @@ delayScreensaver()
             log "delayScreensaver(): trying to delay with xdg-screensaver..."
             xdg-screensaver reset
         fi
-        # wrong way to simulate activity, this will interfere your work
-        # if [ -f /usr/bin/xdotool ]; then
-        #     log "delayScreensaver(): trying to delay with xdotool..."
-        #     xdotool key ctrl
-        # fi
     fi
 
     # Check if DPMS is on. If it is, deactivate. If it is not, do nothing.
