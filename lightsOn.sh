@@ -162,7 +162,7 @@ checkFullscreen()
     for display in $displays
     do
         #get id of active window and clean output
-        activ_win_id=$(DISPLAY=:0.${display} xprop -root _NET_CLIENT_LIST_STACKING | sed 's/.*\, //') #previously used _NET_ACTIVE_WINDOW, but it didn't work with some flash players (eg. Twitch.tv) in firefox. Using sed because id lengths can vary.
+        activ_win_id=$(DISPLAY=${DISPLAY}.${display} xprop -root _NET_CLIENT_LIST_STACKING | sed 's/.*\, //') #previously used _NET_ACTIVE_WINDOW, but it didn't work with some flash players (eg. Twitch.tv) in firefox. Using sed because id lengths can vary.
 
         # Skip invalid window ids (commented as I could not reproduce a case
         # where invalid id was returned, plus if id invalid
@@ -173,8 +173,8 @@ checkFullscreen()
 
         # Check if Active Window (the foremost window) is in a fullscreen state
         if [[ -n $activ_win_id ]]; then
-            isActivWinFullscreen=$(DISPLAY=:0.${display} xprop -id $activ_win_id | grep _NET_WM_STATE_FULLSCREEN)
-            isActivWinAbove=$(DISPLAY=:0.${display} xprop -id $activ_win_id | grep _NET_WM_STATE_ABOVE)
+            isActivWinFullscreen=$(DISPLAY=${DISPLAY}.${display} xprop -id $activ_win_id | grep _NET_WM_STATE_FULLSCREEN)
+            isActivWinAbove=$(DISPLAY=${DISPLAY}.${display} xprop -id $activ_win_id | grep _NET_WM_STATE_ABOVE)
             log "checkFullscreen(): Display: $display isFullScreen: \"$isActivWinFullscreen\""
             log "checkFullscreen(): Display: $display isAbove: \"$isActivWinAbove\""
             if [[ "$isActivWinFullscreen" = *NET_WM_STATE_FULLSCREEN* || "$isActivWinAbove" = *NET_WM_STATE_ABOVE* ]];then
